@@ -8,6 +8,13 @@ const sendBtn = document.getElementById('send-btn');
 const TIMEOUT_MS = 10000; // 10 segundos límite de espera
 const COOLDOWN_MS = 1500;  // 1.5 segundos entre envíos
 
+// Obtener o generar un sessionId único para identificar la sesión del usuario
+let sessionId = localStorage.getItem('chat_session_id');
+if (!sessionId) {
+  sessionId = 'session_' + Math.random().toString(36).substring(2, 11) + '_' + Date.now();
+  localStorage.setItem('chat_session_id', sessionId);
+}
+
 // Ajuste automático de altura del textarea
 userInput.addEventListener('input', () => {
   userInput.style.height = 'auto';
@@ -57,7 +64,7 @@ chatForm.addEventListener('submit', async (e) => {
   }
 });
 
-// Función de envío con fetch, AbortController y manejo de errores
+// Función de envío con fetch, AbortController y envío de message + sessionId
 async function enviarAWebhook(mensaje) {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
@@ -68,7 +75,10 @@ async function enviarAWebhook(mensaje) {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ message: mensaje }),
+      body: JSON.stringify({ 
+        message: mensaje,
+        sessionId: sessionId 
+      }),
       signal: controller.signal
     });
 
