@@ -6,7 +6,7 @@ const sendBtn = document.getElementById('send-btn');
 
 // Configuración de límites y tiempos de espera
 const TIMEOUT_MS = 10000; // 10 segundos límite de espera
-const COOLDOWN_MS = 1500;  // 1.5 segundos entre envíos
+const COOLDOWN_MS = 15000;  // 1.5 segundos entre envíos
 
 // Ajuste automático de altura del textarea
 userInput.addEventListener('input', () => {
