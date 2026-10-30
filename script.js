@@ -6,12 +6,20 @@ const sendBtn = document.getElementById('send-btn');
 
 // Configuración de límites y tiempos de espera
 const TIMEOUT_MS = 10000; // 10 segundos límite de espera
-const COOLDOWN_MS = 15000;  // 1.5 segundos entre envíos
+const COOLDOWN_MS = 1500;  // 1.5 segundos entre envíos
 
 // Ajuste automático de altura del textarea
 userInput.addEventListener('input', () => {
   userInput.style.height = 'auto';
   userInput.style.height = userInput.scrollHeight + 'px';
+});
+
+// Enviar con Enter y permitir salto de línea con Shift + Enter
+userInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault(); // Evita el salto de línea por defecto
+    chatForm.requestSubmit(); // Dispara el evento submit del formulario
+  }
 });
 
 // Manejo del envío del formulario
@@ -70,8 +78,14 @@ async function enviarAWebhook(mensaje) {
       throw new Error(`Error en el servidor: ${response.status}`);
     }
 
-    const data = await response.json();
-    return data.response || data.output || "Respuesta recibida correctamente.";
+    const textData = await response.text();
+
+    try {
+      const jsonData = JSON.parse(textData);
+      return jsonData.response || jsonData.output || jsonData.result || textData;
+    } catch {
+      return textData || "Respuesta recibida correctamente.";
+    }
 
   } catch (error) {
     clearTimeout(timeoutId);
